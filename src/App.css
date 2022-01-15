@@ -1,6 +1,18 @@
 .App {
   text-align: center;
 }
+.food_container{
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.food_div{
+  height: 250px;
+  width: 200px;
+  margin: 5px;
+  border: 1px solid black;
+}
 
 .App-logo {
   height: 40vmin;
