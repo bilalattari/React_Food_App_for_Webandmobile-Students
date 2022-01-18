@@ -1,16 +1,16 @@
 import { useState } from 'react'
 import logo from './logo.svg';
 import './App.css';
+import Card from './component/card';
+import FoodCard from './component/foodCard';
+
 
 function App() {
-
-  // const [counter, setCounter] = useState(0)
-  // const [userName, setUserName] = useState('')
-
   const [foodName, setFoodName] = useState('')
   const [foodPrice, setFoodPrice] = useState('')
   const [foodImg, setFoodImg] = useState('')
   const [foodDesc, setFoodDesc] = useState('')
+  const [edit, setEdit] = useState(false)
 
 
 
@@ -21,13 +21,6 @@ function App() {
     foodPrice: "200"
   }])
 
-  // const increment = () => { setCounter(counter + 1) }
-
-  // const decrement = () => {
-  //   if (counter > 0) {
-  //     setCounter(counter - 1)
-  //   }
-  // }
 
   const onChangeFoodName = (e) => {
     setFoodName(e.target.value)
@@ -57,12 +50,15 @@ function App() {
     setFoodDesc('')
   }
 
+  const editFood = () => {
 
-  console.log('foods======>', foods)
+  }
+
 
   return (
     <div className="App">
       <h1>My First React App</h1>
+
 
       <input
         onChange={onChangeFoodName}
@@ -84,34 +80,31 @@ function App() {
         placeholder='description'
         value={foodDesc} />
 
-      <button onClick={addFood}>Add Food</button>
+      <button onClick={edit ? editFood : addFood}>{edit ? 'Update' : 'Add'}</button>
 
       <div className='food_container'>
 
         {
           foods.map((data, index) => {
             return (
-              <div className='food_div'>
-                <img src={data.foodImg} height={'200'} width={'200'} />
-                <span>{data.foodName}</span>
-
-                <button onClick={() => alert(index)}>delete</button>
-              </div>)
+              <FoodCard name={data.foodName}
+                img={data.foodImg}
+                price={data.foodPrice}
+                desc={data.foodDesc}
+                deleteItem={() => {
+                  foods.splice(index, 1)
+                  setFoods([...foods])
+                }}
+                editItem={() =>
+                  setEdit(true)
+                  // console.log(foods[index])
+                }
+              />)
           })
         }
       </div>
 
-      {/* <input
-        onChange={onChangeUserName}
-        placeholder='User name'
-        value={userName} />
 
-      <br />
-      <br />
-
-      <button onClick={increment}>+</button>
-      <h1>{counter}</h1>
-      <button disabled={counter === 0} onClick={decrement}>-</button> */}
     </div>
   );
 }
