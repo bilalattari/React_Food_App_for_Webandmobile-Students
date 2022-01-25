@@ -6,7 +6,8 @@ import FoodCard from './component/foodCard';
 import { Routes, Route } from "react-router-dom";
 import Home from './screens/Home'
 import About from './screens/About'
-
+import Todos from './screens/Todos';
+import AddTodos from './screens/AddTodo';
 
 function App() {
 
@@ -14,10 +15,10 @@ function App() {
 
   return (
     <div className="App">
-      <h1>My First React App</h1>
+      <h1>Todo App</h1>
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="about" element={<About />} />
+        <Route path="/" element={<Todos />} />
+        <Route path="add" element={<AddTodos />} />
       </Routes>
     </div>
   );
