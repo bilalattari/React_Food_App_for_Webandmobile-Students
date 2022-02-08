@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import logo from './logo.svg';
 import './App.css';
 import Card from './component/card';
@@ -8,17 +7,17 @@ import Home from './screens/Home'
 import About from './screens/About'
 import Todos from './screens/Todos';
 import AddTodos from './screens/AddTodo';
-
+import Login from './screens/login';
+import { onAuthChanges } from './firebase'
 function App() {
 
 
 
   return (
     <div className="App">
-      <h1>Todo App</h1>
       <Routes>
         <Route path="/" element={<Todos />} />
-        <Route path="add" element={<AddTodos />} />
+        <Route path="login" element={<Login />} />
       </Routes>
     </div>
   );
