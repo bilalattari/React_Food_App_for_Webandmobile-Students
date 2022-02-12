@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from "react";
 import './home.css'
-import { getDocs, db, eventRef, auth } from '../firebase'
+import { getDocs, db, eventRef, auth, query } from '../firebase'
 import Conatiner from "../component/Container";
 import { Card, Avatar } from 'antd';
 import { Link, useNavigate } from 'react-router-dom'
-import { EditOutlined, EllipsisOutlined, SettingOutlined } from '@ant-design/icons';
+import { EllipsisOutlined, SettingOutlined } from '@ant-design/icons';
+import { where } from "firebase/firestore";
+import { UploadOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+
 const { Meta } = Card;
 
-function Home() {
+function MyEvents() {
     const [color, setColor] = useState('red')
     const [eve, setEve] = useState([])
     const navigate = useNavigate()
@@ -21,7 +24,8 @@ function Home() {
     }, [])
 
     const getAllEvent = async () => {
-        const querySnapshot = await getDocs(eventRef);
+        const q = query(eventRef, where("uid", "==", auth.currentUser.uid))
+        const querySnapshot = await getDocs(q);
         let events = []
         querySnapshot.forEach((doc) => {
             // doc.data() is never undefined for query doc snapshots
@@ -51,9 +55,9 @@ function Home() {
                                     />
                                 }
                                 actions={[
-                                    <SettingOutlined key="setting" />,
+                                    <EditOutlined color="blue" key="setting" />,
 
-                                    <EllipsisOutlined key="ellipsis" />,
+                                    <DeleteOutlined color="red" key="ellipsis" />,
                                 ]}
                             >
                                 <Meta
@@ -71,4 +75,4 @@ function Home() {
     )
 }
 
-export default Home
+export default MyEvents

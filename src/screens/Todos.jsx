@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { addTodoToFirebase, getUsersTodos, logout, onAuthChanges } from '../firebase'
 import './todos.css'
-
+import { getStorage, ref, uploadBytes, getDownloadURL } from '../firebase'
 const Todos = () => {
 
     const [todos, setTodos] = useState([])
@@ -10,79 +9,28 @@ const Todos = () => {
     const [edit, setEdit] = useState(null)
 
     const navigate = useNavigate()
-    useEffect(() => {
-        onAuthChanges
-            .then((result) => {
-                console.log('userSignedIn=>', result)
-                getUsersTodos().then((arrayOfTodos) => {
-                    console.log('arrayOfTodos=>', arrayOfTodos)
-                    setTodos(arrayOfTodos)
-                })
 
-            })
-            .catch(() => {
-                navigate('login')
-            })
-
-
-        let todos = localStorage.getItem('todos')
-        todos = JSON.parse(todos)
-        setTodos(todos)
-    }, [])
-
-
-    const handleOnChangeTodo = (e) => setTodo(e.target.value)
-
-    const addTodo = () => {
-        addTodoToFirebase(todo).then(() => {
-            setTodo('')
-            getUsersTodos().then((arrayOfTodos) => {
-                console.log('arrayOfTodos=>', arrayOfTodos)
-                setTodos(arrayOfTodos)
-            })
-        }).catch(() => console.log('Todo not added'))
+    const handleUploadImage = (e) => {
+        console.log('function called')
+        const storage = getStorage();
+        const storageRef = ref(storage, 'some-child');
+        console.log('Upload files===>', e.target.files[0])
+        // 'file' comes from the Blob or File API
+        uploadBytes(storageRef, e.target.files[0]).then((snapshot) => {
+            console.log('Uploaded a blob or file!');
+            getDownloadURL(storageRef).then((downloadURL) => {
+                console.log('File available at', downloadURL);
+            });
+        });
     }
 
-    const editTodo = (ind) => {
-        const todoList = todos
-        setEdit(ind)
-        setTodo(todoList[ind])
-    }
-
-    const deleteTodo = (ind) => {
-        const todoList = todos
-        todoList.splice(ind, 1)
-
-        setTodos([...todoList])
-        localStorage.setItem('todos', JSON.stringify([...todoList]))
-
-    }
 
 
 
     return (
         <div>
 
-            <button onClick={logout}>Logout</button>
-            <input placeholder='Todo' value={todo}
-                onChange={handleOnChangeTodo} />
-
-            <button onClick={addTodo}>{edit !== null ? 'Edit Todo' : 'Add Todo'}</button>
-            {
-                todos && todos.map((data, index) => {
-                    return (
-                        <div key={index} className='todo-item'>
-                            <span>{data.todo}</span> <br />
-                            <span>{data.uid}</span>
-                            <div>
-                                <button onClick={() => editTodo(index)}>Edit</button>
-                                <button onClick={() => deleteTodo(index)} >Delete</button>
-                            </div>
-                        </div>
-                    )
-                })
-            }
-
+            <input type={'file'} onChange={handleUploadImage} />
 
         </div>
     )
