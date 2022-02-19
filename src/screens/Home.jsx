@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import './home.css'
-import { getDocs, db, eventRef, auth } from '../firebase'
+import { getDocs, db, eventRef, auth, onAuthStateChanged } from '../firebase'
 import Conatiner from "../component/Container";
 import { Card, Avatar } from 'antd';
 import { Link, useNavigate } from 'react-router-dom'
@@ -13,11 +13,13 @@ function Home() {
     const navigate = useNavigate()
 
     useEffect(async () => {
-        if (auth.currentUser == null) {
-            navigate('/login')
-        }
         getAllEvent()
-
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+            } else {
+                navigate('/login')
+            }
+        })
     }, [])
 
     const getAllEvent = async () => {
@@ -31,8 +33,12 @@ function Home() {
         setEve(events)
     }
 
+    const goToEventPage = (event) => {
+        console.log('event=>', event)
+        navigate(`/event/${event.eventName}/${event.id}`)
+    }
 
-    console.log('events==>', eve)
+
 
     return (
         <Conatiner>
@@ -42,7 +48,8 @@ function Home() {
                     eve.map((data, index) => {
                         return (
                             <Card
-                                style={{ width: 300, margin: 12 }}
+                                onClick={() => goToEventPage(data)}
+                                style={{ cursor: 'pointer', width: 300, margin: 12 }}
                                 cover={
                                     <img
                                         alt="example"
