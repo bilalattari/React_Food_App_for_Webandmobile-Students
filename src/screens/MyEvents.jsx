@@ -35,6 +35,10 @@ function MyEvents() {
         setEve(events)
     }
 
+    const handleOnPressEdit = (id) => {
+        navigate(`/event/edit/${id}`)
+    }
+
 
     console.log('events==>', eve)
 
@@ -55,7 +59,7 @@ function MyEvents() {
                                     />
                                 }
                                 actions={[
-                                    <EditOutlined color="blue" key="setting" />,
+                                    <EditOutlined color="blue" onClick={() => handleOnPressEdit(data.id)} key="setting" />,
 
                                     <DeleteOutlined color="red" key="ellipsis" />,
                                 ]}

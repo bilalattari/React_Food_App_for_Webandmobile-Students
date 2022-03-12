@@ -1,19 +1,20 @@
 import react, { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import {
     Image, Form, DatePicker, TimePicker,
     Upload,
     Button, Alert, Input
 } from 'antd';
-import { UploadOutlined , EditOutlined , DeleteOutlined  } from '@ant-design/icons';
+import { UploadOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 
 import './login.css'
 import {
-    createUserWithEmailAndPassword,
+
     getStorage, uploadBytes, getDownloadURL,
-    userRef, auth, addDoc, ref, eventRef
+    auth, addDoc, ref, eventRef, doc, db, getDoc
 } from '../firebase'
 import Conatiner from '../component/Container';
+import { setDoc } from 'firebase/firestore';
 
 const formItemLayout = {
     labelCol: {
@@ -54,11 +55,37 @@ const rangeConfig = {
 
 
 const AddEvent = () => {
-    const [form] = Form.useForm();
+    const [form, setForm] = Form.useForm();
     const navigate = useNavigate()
     const [error, setError] = useState('')
     const [loading, setLoading] = useState(false)
+    const [event, setEvent] = useState(null)
 
+    const params = useParams()
+    console.log('params==>', params)
+
+    useEffect(() => {
+        getEvent()
+    }, [])
+
+    const getEvent = async () => {
+        setLoading(true)
+        if (params?.id) {
+            const ref = doc(db, 'events', params.id)
+            const event = await getDoc(ref)
+            console.log('event.exists=>', event.exists())
+            if (event.exists()) {
+                console.log('event data=>', event.data())
+
+                form.setFieldsValue({
+                    ...form, name: event.data().eventName, description: event.data().eventDesc,
+                })
+                // setEvent()
+            }
+        }
+
+        setLoading(false)
+    }
     const normFile = (e) => {
         console.log('Upload event:', e);
 
@@ -89,11 +116,20 @@ const AddEvent = () => {
                 eventImg,
                 uid: auth.currentUser.uid
             }
-            addDoc(eventRef, obj).then(() => {
-                navigate('/')
-                setLoading(true)
+            if (params.id) {
+                setDoc(doc(db, 'events', params.id), obj).then(() => {
+                    navigate('/')
+                    setLoading(true)
 
-            }).catch(() => setLoading(false))
+                }).catch(() => setLoading(false))
+            } else {
+                addDoc(eventRef, obj).then(() => {
+                    navigate('/')
+                    setLoading(true)
+
+                }).catch(() => setLoading(false))
+            }
+
         }
         setLoading(true)
 
@@ -130,7 +166,7 @@ const AddEvent = () => {
             }
 
 
-            <Form name="time_related_controls" {...formItemLayout} onFinish={onFinish}>
+            <Form form={form} name="time_related_controls" {...formItemLayout} onFinish={onFinish}>
                 <Form.Item
                     name="name"
                     label="Event Name"
@@ -189,7 +225,7 @@ const AddEvent = () => {
                     }}
                 >
                     <Button loading={loading} type="primary" htmlType="submit">
-                        Submit
+                        {params.id ? 'Edit' : 'Submit'}
                     </Button>
                 </Form.Item>
             </Form>
